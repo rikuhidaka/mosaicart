@@ -7,17 +7,25 @@ from pathlib import Path
 import numpy as np
 import tqdm
 import os
-#import glob
 
+def cut_img(img):
+    #画像をトリミングする
+    w,h = img.size
+    if(w>=h):
+        img = img.crop((0,0,h,h))
+    else:
+        img = img.crop((0,0,w,w))   
+    return img
+        
 def load_img(path):
+    #画像を読み込む
     img = Image.open(path)
+    img = cut_img(img)
+    #HSVへ変換
     img.convert('HSV')
     return np.asarray(img)[:, :, :3]
 
 def load_data(size=50):
-    tlx = 0
-    tly = 0
-    sz = 500
         
     for i in Path('subdata').glob('**/*.png'):
         print(type(i))
@@ -31,8 +39,6 @@ def load_data(size=50):
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
-    img_list = [ img[tly:tly+sz, tlx:tlx+sz, :] for img in img_list ]
-
     img_list = [ np.asarray(Image.fromarray(img).resize((size, size))) for img in img_list ]
 
     return (img_paths, img_list)
@@ -63,11 +69,14 @@ def main(feature_div):
     # 全画像の特徴量を計算
     features = [feature(img,feature_div).tolist() for img in img_list]
 
+    print(img_paths)
+    
     # jsonに書き込む
     with open('features.json', 'w') as f:
         json.dump( OrderedDict([
             ('block_size', block_size),
-            ('features', OrderedDict(zip(img_paths, features)))
+            #('data', OrderedDict((('num',str(num)),('features',feature) for num,fature in zip(img_paths,features))))
+            ('data',(('name', img_paths),('feature',features)) )
         ]), f, indent=4 )
 
 if __name__ == '__main__':
