@@ -6,6 +6,15 @@ from PIL import Image
 from collections import OrderedDict
 from pathlib import Path
 
+def cut_img(img):
+    #画像をトリミングする
+    w,h = img.size
+    if(w>=h):
+        img = img.crop((0,0,h,h))
+    else:
+        img = img.crop((0,0,w,w))   
+    return img
+
 #5～23は処理が重複するので省略する
 def load_img(path):
     img = Image.open(path)
@@ -13,18 +22,19 @@ def load_img(path):
     return np.asarray(img)[:, :, :3]
 
 def load_data(size=50):
-    tlx = 0
-    tly = 0
-    sz = 500
-
-    img_paths = list( Path('data/').glob('**/*.jpg') )
+        
+    for i in Path('subdata').glob('**/*.png'):
+        print(type(i))
+        rgb_im = Image.open(str(i)).convert('RGB')
+        root,_ = os.path.splitext(str(i))
+        name = root + '.jpg'
+        rgb_im.save(name)
+        os.remove(str(i))
+    
+    img_paths = list( Path('subdata/').glob('**/*.jpg') )
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
-    #画像をsz×szで切り取り
-    img_list = [ img[tly:tly+sz, tlx:tlx+sz, :] for img in img_list ]
-
-    #サイズを小さくする
     img_list = [ np.asarray(Image.fromarray(img).resize((size, size))) for img in img_list ]
 
     return (img_paths, img_list)

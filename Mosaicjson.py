@@ -13,26 +13,6 @@ def load_img(path):
     img.convert('HSV')
     return np.asarray(img)[:, :, :3]
 
-# dataディレクトリ内の素材画像(pngファイル)をすべて読み込んでリストで返す
-# 素材画像は自動的に切り抜かれる．tlxが切り抜く正方形の左上のx座標,tlyがy座標，szが正方形の一辺の長さ
-# 切り抜く正方形が画像からはみ出している場合ちゃんと動かないので注意 (多分エラーになる)
-# 素材画像の一辺の長さはsizeに調整される
-def load_data(size=50):
-    tlx = 0
-    tly = 0
-    sz = 500
-
-    #画像の読み込み
-    img_paths = list( Path('subdata/').glob('**/*.jpg') )
-    img_paths = [str(path) for path in img_paths]
-
-    img_list = [ load_img(img) for img in img_paths ]
-    img_list = [ img[tly:tly+sz, tlx:tlx+sz, :] for img in img_list ]
-
-    img_list = [ np.asarray(Image.fromarray(img).resize((size, size))) for img in img_list ]
-
-    return (img_paths, img_list)
-
 # 画像の特徴量を計算
 def feature(img,feature_div):
     chunk_sz = img.shape[0]/feature_div
@@ -68,9 +48,6 @@ def main(feature_div,blk_size):
     # 近似対象画像を読み込む
     img = load_img('source.jpg')
 
-    # 素材画像を読み込む
-    img_paths,_ = load_data()
-
     # 近似対象画像のサイズ(画素)
     h = img.shape[0] # 縦
     w = img.shape[1] # 横
@@ -80,7 +57,10 @@ def main(feature_div,blk_size):
     m = w//blk_size # 横
 
     tile_blksz = tiles_features['block_size']
-    tiles_features = tiles_features['features'].values()
+    tiles_data = tiles_features['data']
+    tiles_features = tiles_data[1][:len(tiles_data[1])][1]
+    print(tiles_features)
+    tiles_name = tiles_data[0][:len(tiles_data[0])][1]
 
     out = OrderedDict()
     out['block_size'] = tile_blksz
@@ -105,4 +85,4 @@ def main(feature_div,blk_size):
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(2,10)
+    main(1,10)
