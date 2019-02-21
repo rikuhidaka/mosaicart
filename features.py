@@ -6,6 +6,8 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 import tqdm
+import os
+#import glob
 
 def load_img(path):
     img = Image.open(path)
@@ -16,8 +18,16 @@ def load_data(size=50):
     tlx = 0
     tly = 0
     sz = 500
+        
+    for i in Path('subdata').glob('**/*.png'):
+        print(type(i))
+        rgb_im = Image.open(str(i)).convert('RGB')
+        root,_ = os.path.splitext(str(i))
+        name = root + '.jpg'
+        rgb_im.save(name)
+        os.remove(str(i))
     
-    img_paths = list( Path('data/').glob('**/*.jpg') )
+    img_paths = list( Path('subdata/').glob('**/*.jpg') )
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
@@ -45,6 +55,7 @@ def feature(img,feature_div):
 
 def main(feature_div):
     img_paths, img_list = load_data() # 素材画像の読み込み
+    #print(img_list)
     assert(len(set((img.shape for img in img_list))) == 1) # 素材画像がすべて同じ大きさかチェック
     assert(img_list[0].shape[0] == img_list[0].shape[1]) # 素材画像が正方形かチェック
     block_size = img_list[0].shape[0] # 素材画像の一辺の長さをblock_sizeとする

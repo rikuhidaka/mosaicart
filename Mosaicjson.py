@@ -23,7 +23,7 @@ def load_data(size=50):
     sz = 500
 
     #画像の読み込み
-    img_paths = list( Path('data/').glob('**/*.jpg') )
+    img_paths = list( Path('subdata/').glob('**/*.jpg') )
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
@@ -32,8 +32,6 @@ def load_data(size=50):
     img_list = [ np.asarray(Image.fromarray(img).resize((size, size))) for img in img_list ]
 
     return (img_paths, img_list)
-
-# 分割数
 
 # 画像の特徴量を計算
 def feature(img,feature_div):
