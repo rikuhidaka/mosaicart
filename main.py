@@ -1,11 +1,11 @@
+#coding=utf-8
+
 #コマンドラインに
 #
 # $ export FLASK_APP=main.py
 # $ flask run
 #
 #と入力しないと実行できないと思われ
-
-#coding=utf-8
 
 import os
 import shutil
@@ -17,15 +17,18 @@ import gscraping
 import producemosaic
 import numpy as np
 from PIL import Image
-from flask import Flask,request,url_for,send_from_directory,Response,jsonify
+from flask import Flask,request,url_for,send_from_directory,Response,make_response,jsonify
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif','json'])
 
 app = Flask(__name__)
-progress = 0.00
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
+
+progress = {}
 list = {}
 key = 0
 
+#明日実装予定
 @app.errorhandler(404)
 def error(e):
     return "{}, {}".format(e.message, e.description)
@@ -43,10 +46,19 @@ def index():
 def source():
     app.config['UPLOAD_FOLDER'] = './'
     if request.method == 'POST':
-        img_file = request.files['file']
-        filename = "source.png"
+        img_file = request.files['image']
+        if 'image' not in request.files:
+            return make_response(jsonify({'result':'field name needs to be "image"'}))
+        if img_file.mimetype == "image/png":
+            filename = "source.png"
+        elif img_file.mimetype == "image/jpeg":
+            filename = "source.jpg"
+        else:
+            return make_response(jsonify({'result':"mimetype not acceptable"}))
+
         img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return 0
+
+        return make_response(jsonify({'result':"ok"}))
     else:
         return flask.redirect('/404')
 
@@ -55,7 +67,7 @@ def source():
 def post():
     app.config['UPLOAD_FOLDER'] = './'
     if request.method == 'POST':
-        json_data = request.get_json()
+        json_data = request.get_json(force=True)
         filename = "features.json"
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'w') as f:
             json.dump(json_data,f,indent=4)
@@ -103,7 +115,8 @@ def mosaic():
 #進捗を渡す
 @app.route('/progress/',methods=['GET'])
 def progess():
-    return jsonify({"progress":Mosaicjson.hoge})
+    progess[request.cookie.get('user')] = Mosaicjson.hoge
+    return jsonify({"progress":progress[request.cookie.get('user')]})
 
 #producemosaicart.jsonを返す
 @app.route('/get/',methods=['GET'])
@@ -123,4 +136,4 @@ def reset():
     return Response(status=200, mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host="0.0.0.0",port=80,threaded=True)
