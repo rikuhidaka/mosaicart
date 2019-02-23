@@ -28,6 +28,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif','json'])
 
 app = Flask("main")
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+app.config['JSON_SORT_KEYS'] = False
 
 progress = {}
 IDlist = []
@@ -98,8 +99,8 @@ def json_post():
 @app.route('/get/',methods=['GET'])
 def json_get():
     if request.method == 'GET':
-        directory = cookie_check()
-        app.config['UPLOAD_FOLDER'] = './' + directory + '/'
+        #directory = cookie_check()
+        app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
         filename = "producemosaicart.json"
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'r') as f:
             json_data = json.load(f)
@@ -143,7 +144,7 @@ def mosaic():
     feature_div = json_data["feature_div"]
     blk_size = json_data["blk_size"]
 
-    th = threading.Thread(target=Mosaicjson.main,args=[feature_div,blk_size,directory,progress[request.cookie.get('ID')]])
+    th = threading.Thread(target=Mosaicjson.main,args=[feature_div,blk_size,directory,request.cookie.get('ID'),progress])
     th.daemon = True
     th.start()
 
