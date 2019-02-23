@@ -30,9 +30,7 @@ def feature(img,feature_div):
 def distance_feature(x, y):
     return np.sum(np.linalg.norm(x - y, axis=2))
 
-hoge = 0.00
-
-def main(feature_div,blk_size,distance_pix,id,hoge):
+def main(feature_div,blk_size,distance_pix,id,progress):
     # 近似対象画像をどれくらいの細かさでモザイク化するか
     # blk_size×blk_sizeの正方形を最小単位としてモザイク化する
     # 1のとき1×1の正方形が最小単位となるので最も細かいが，処理に時間がかかるし生成される画像が大きくなる
@@ -62,7 +60,8 @@ def main(feature_div,blk_size,distance_pix,id,hoge):
     huga = {}
     tile_num = list(range(len(tiles_data)))
     count = 0
-    hoge[id] = 0
+    progress[id] = 0.0
+    hoge = 0
     c = 0
     
     
@@ -92,10 +91,11 @@ def main(feature_div,blk_size,distance_pix,id,hoge):
             dele.sort()
             if(k<n):
                 tiles = list(set(tile_num) - set(dele) )
-                print(tiles)
                 number = np.argmin([distance_feature(feature(block,feature_div), tiles_data[tiles[y]]) for y in range(len(tiles))])
                 nearest = tiles[number]
-                hoge[id] += 1
+                hoge += 1
+                progress[id] = round(float(hoge)/(float(n)*float(m)),2)
+                print(progress[id])
                 huga[k*m + j] = nearest 
                 #次のループで使ってはいけない画像番号の行列
                 abatement[distance_pix].append(nearest)

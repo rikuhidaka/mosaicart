@@ -32,7 +32,7 @@ app = Flask("main")
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 app.config['JSON_SORT_KEYS'] = False
 
-progress = {}
+progress = {"static":0.00}
 IDlist = []
 
 @app.errorhandler(404)
@@ -62,14 +62,19 @@ def cookie_check():
 
 @app.route('/mkdir/')
 def make_directory():
-    ID = request.cookie.get('ID')
-    os.mkdir("./"+ID)
+    ID = "./static"#request.cookie.get('ID')
+    if os.path.exists(ID)==False:
+        os.mkdir("./"+ID)
+        return "ok"
+    else:
+        return "already exists!"
+
 
 #source.pngを受け取る
 @app.route('/source/',methods=['GET','POST'])
 def source():
-    directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
+    #directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './' + "static"# directory + '/'
 
     json_data = request.get_json(force=True)
 
@@ -101,8 +106,8 @@ def source():
 #features.jsonを受け取る
 @app.route('/post/',methods=['GET','POST'])
 def json_post():
-    directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
+    #directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './' + "static"# + directory + '/'
     json_data = request.get_json(force=True)
     filename = "features.json"
     with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'w') as f:
@@ -113,8 +118,8 @@ def json_post():
 @app.route('/get/',methods=['GET'])
 def json_get():
     if request.method == 'GET':
-        directory = cookie_check()
-        app.config['UPLOAD_FOLDER'] = './' + directory + '/'
+        #directory = cookie_check()
+        app.config['UPLOAD_FOLDER'] = './' + "static"# + directory + '/'
         filename = "producemosaicart.json"
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'r') as f:
             json_data = json.load(f)
@@ -142,8 +147,8 @@ def features():
 @app.route('/out/',methods=['GET'])
 def out():
     if request.method == 'GET':
-        directory = cookie_check()
-        app.config['UPLOAD_FOLDER'] = './' + directory + '/'
+        #directory = cookie_check()
+        app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
         filename = "out.png"
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'r') as f:
             image = f.read()
@@ -154,28 +159,35 @@ def out():
 #Mosaicjson.pyを実行
 @app.route('/mosaic/',methods=['GET','POST'])
 def mosaic():
-    json_data = request.get_json(force=True)
-    feature_div = json_data["feature_div"]
-    blk_size = json_data["blk_size"]
+    #json_data = request.get_json(force=True)
+    feature_div = 10#json_data["feature_div"]
+    blk_size = 10#json_data["blk_size"]
+    distance_pix = 2#json_data["distance_pix"]
 
-    th = threading.Thread(target=Mosaicjson.main,args=[feature_div,blk_size,directory,request.cookie.get('ID'),progress])
-    th.daemon = True
-    th.start()
+    Mosaicjson.main(feature_div,blk_size,distance_pix,"static",progress)
+
+   # th = threading.Thread(target=Mosaicjson.main,args=[feature_div,blk_size,distance_pix,"static",progress])
+        #request.cookie.get('ID'),progress])
+    #th.daemon = True
+    #th.start()
 
     return make_response(jsonify({"result":"succeeded"}))
 
 #進捗を渡す
 @app.route('/progress/',methods=['GET'])
 def progess():
-    return make_response(jsonify({"progress":progress[request.cookie.get('ID')]}))
+    return make_response(jsonify({"progress":progress["static"]}))#[request.cookie.get('ID')]}))
 
 #作業ディレクトリを消去
 @app.route('/delete/')
 def reset():
-    directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
-    shutil.rmtree(os.path.join(app.config['UPLOAD_FOLDER']))
-    return make_response(jsonify({"result":"deleted"}))
+    #directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './static'# + directory + '/'
+    if os.path.exists(app.config['UPLOAD_FOLDER'])==True:
+        shutil.rmtree(app.config['UPLOAD_FOLDER'])
+        return make_response(jsonify({"result":"deleted"}))
+    else:
+        return "does not exist!"
 
 if __name__ == "__main__":
     app.run(debug=True,host="0.0.0.0",port=80,threaded=True)
