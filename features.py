@@ -24,9 +24,9 @@ def load_img(path):
     img.convert('HSV')
     return np.asarray(img)[:, :, :3]
 
-def load_data(size=50):
+def load_data(id,size=50):
         
-    for i in Path('data').glob('**/*.png'):
+    for i in Path(id +'/data').glob('**/*.png'):
         print(type(i))
         rgb_im = Image.open(str(i)).convert('RGB')
         root,_ = os.path.splitext(str(i))
@@ -58,8 +58,8 @@ def feature(img,feature_div):
 
     return f / n_chunk_pixels
 
-def main(feature_div):
-    img_paths, img_list = load_data() # 素材画像の読み込み
+def main(feature_div,id):
+    img_paths, img_list = load_data(id=id) # 素材画像の読み込み
     #print(img_list)
     img_paths.sort()
     assert(len(set((img.shape for img in img_list))) == 1) # 素材画像がすべて同じ大きさかチェック
@@ -73,11 +73,11 @@ def main(feature_div):
         print(str(i)+' : '+str(img_paths[i]))
     
     # jsonに書き込む
-    with open('features.json', 'w') as f:
+    with open(id + '/features.json', 'w') as f:
         json.dump( OrderedDict([
             ('block_size', block_size),
-            ('feature',features)
+            ('data',(('name', img_paths),('feature',features)))
         ]), f, indent=4 )
 
 if __name__ == '__main__':
-    main(1)
+    main(1,"./")
