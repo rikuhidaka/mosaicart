@@ -5,7 +5,6 @@ import numpy as np
 import json
 from collections import OrderedDict
 from pathlib import Path
-import tqdm
 
 # pathで指定された画像ファイルを読み込んで三次元配列(numpyのndarray)で返す
 def load_img(path):
@@ -33,15 +32,15 @@ def distance_feature(x, y):
 
 hoge = 0.00
 
-def main(feature_div,blk_size,distance_pix,hoge,keyword):
+def main(feature_div,blk_size,distance_pix,id,hoge):
     # 近似対象画像をどれくらいの細かさでモザイク化するか
     # blk_size×blk_sizeの正方形を最小単位としてモザイク化する
     # 1のとき1×1の正方形が最小単位となるので最も細かいが，処理に時間がかかるし生成される画像が大きくなる
     # 事前に計算した素材画像の特徴量を読み込む
-    with open('features.json', 'r') as f:
+    with open(id + '/features.json', 'r') as f:
         tiles_features = json.load(f, object_pairs_hook=OrderedDict)
     # 近似対象画像を読み込む
-    img = load_img('static/source.jpg')
+    img = load_img(id + '/source.jpg')
     # 近似対象画像のサイズ(画素)
     h = img.shape[0] # 縦
     w = img.shape[1] # 横
@@ -50,7 +49,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     m = w//blk_size # 横
     tile_blksz = tiles_features['block_size']
     tiles_data = tiles_features['feature']
-    
+
     out = OrderedDict()
     out['block_size'] = tile_blksz
     out['mosaic_size_h'] = n
@@ -63,11 +62,11 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     huga = {}
     tile_num = list(range(len(tiles_data)))
     count = 0
-    hoge=0
+    hoge[id] = 0
     c = 0
     
     
-    for i in tqdm.trange(m*2-1):
+    for i in range(m*2-1):
         j = i
         k = 0
         count = count%(distance_pix)
@@ -93,9 +92,10 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             dele.sort()
             if(k<n):
                 tiles = list(set(tile_num) - set(dele) )
+                print(tiles)
                 number = np.argmin([distance_feature(feature(block,feature_div), tiles_data[tiles[y]]) for y in range(len(tiles))])
                 nearest = tiles[number]
-                hoge+=1
+                hoge[id] += 1
                 huga[k*m + j] = nearest 
                 #次のループで使ってはいけない画像番号の行列
                 abatement[distance_pix].append(nearest)
@@ -118,8 +118,8 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
                 break
     nears = sorted(huga.items())
     out['images'] = [nears[i][1] for i in range(len(nears))]
-    fw = open('producemosaicart.json','w')
+    fw = open(id + '/producemosaicart.json','w')
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(1,15,3,0,"")
+    main(1,15,1,"static",{"static":0})

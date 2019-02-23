@@ -14,6 +14,8 @@ from collections import OrderedDict
 import threading
 import binascii
 import datetime
+import werkzeug
+import base64
 
 import features
 import Mosaicjson
@@ -65,29 +67,41 @@ def make_directory():
 #source.pngを受け取る
 @app.route('/source/',methods=['GET','POST'])
 def source():
-    directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
-    img_file = request.files['source']
-    print(img_file.name)
-    if 'source' not in request.files:
-        return make_response(jsonify({'result':'field name needs to be "source"'}))
-    if img_file.mimetype == "image/png":
-        filename = "source.png"
-    elif img_file.mimetype == "image/jpeg":
-        filename = "source.jpg"
-    else:
-        return make_response(jsonify({'result':"mimetype not acceptable"}))
+    #directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
 
-    img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    json_data = request.get_json(force=True)
 
-    return make_response(jsonify({'result':"ok"}))
+    filename = "source.jpg"
+
+    contentDataAscii = json_data["attachment"]
+    contentData = base64.b64decode(contentDataAscii)
+    
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'wb') as f:
+        f.write(contentData)
+
+    #multipart/form用
+
+    #img_file = request.files['source']
+   # print(img_file.name)
+   # if 'source' not in request.files:
+    #    return make_response(jsonify({'result':'field name needs to be "source"'}))
+   # if img_file.mimetype == "image/png":
+    #    filename = "source.png"
+   # elif img_file.mimetype == "image/jpeg":
+     #   filename = "source.jpg"
+   # else:
+    #  return make_response(jsonify({'result':"mimetype not acceptable"}))
+
+   # img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    return jsonify({'result1':"ok1",'result2':"ok2",'result3':"ok3"})
 
 #features.jsonを受け取る
 @app.route('/post/',methods=['GET','POST'])
 def json_post():
-    directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
-    img_file = request.files['source']
+   # directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
     json_data = request.get_json(force=True)
     filename = "features.json"
     with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'w') as f:
@@ -112,7 +126,7 @@ def json_get():
 def scrape():
     json_data = request.get_json(force=True)
     keyword = json_data["keyword"]
-    gscraping.main(keyword)
+    gscraping.main(keyword,id)
     return make_response(jsonify({"result":"succeeded"}))
 
 #features.pyを実行
@@ -120,7 +134,7 @@ def scrape():
 def features():
     json_data = request.get_json(force=True)
     feature_div = json_data["feature_div"]
-    features.main(feature_div)
+    features.main(feature_div,id)
     return make_response(jsonify({"result":"succeeded"}))
  
 #out.pngを返す

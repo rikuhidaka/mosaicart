@@ -21,22 +21,22 @@ def load_img(path):
     img.convert('HSV')
     return np.asarray(img)[:, :, :3]
 
-def load_data(size=50):
-    for i in Path('data').glob('**/*.png'):
+def load_data(id,size=50):
+    for i in Path(id + '/data').glob('**/*.png'):
         print(type(i))
         rgb_im = Image.open(str(i)).convert('RGB')
         root,_ = os.path.splitext(str(i))
         name = root + '.jpg'
         rgb_im.save(name)
         os.remove(str(i))
-    img_paths = list( Path('data/').glob('**/*.jpg') )
+    img_paths = list( Path(id + 'data/').glob('**/*.jpg') )
     img_paths = [str(path) for path in img_paths]
     img_list = [ load_img(img) for img in img_paths ]
     img_list = [ np.asarray(Image.fromarray(img).resize((size, size))) for img in img_list ]
     return (img_paths, img_list)
 
-def main():
-    with open('producemosaicart.json','r') as f:
+def main(id):
+    with open(id + '/producemosaicart.json','r') as f:
         mosaic = json.load(f,object_pairs_hook=OrderedDict)
     _, data_list = load_data()
     size = mosaic['block_size']
@@ -52,7 +52,7 @@ def main():
             out_bry = size*(i+1)
             out_brx = size*(j+1)
             out[out_tly:out_bry, out_tlx:out_brx, :] = data_list[images[(i*w)+j]]    
-    Image.fromarray(out).save('static/out.png')
+    Image.fromarray(out).save(id + '/out.png')
 
 if __name__ == '__main__':
-    main()
+    main("tmp")
