@@ -62,6 +62,7 @@ def feature(img,feature_div):
 def main(feature_div):
     img_paths, img_list = load_data() # 素材画像の読み込み
     #print(img_list)
+    img_paths.sort()
     assert(len(set((img.shape for img in img_list))) == 1) # 素材画像がすべて同じ大きさかチェック
     assert(img_list[0].shape[0] == img_list[0].shape[1]) # 素材画像が正方形かチェック
     block_size = img_list[0].shape[0] # 素材画像の一辺の長さをblock_sizeとする
@@ -69,7 +70,8 @@ def main(feature_div):
     # 全画像の特徴量を計算
     features = [feature(img,feature_div).tolist() for img in img_list]
 
-    print(img_paths)
+    for i in range(len(img_paths)):
+        print(str(i)+' : '+str(img_paths[i]))
     
     # jsonに書き込む
     with open('features.json', 'w') as f:

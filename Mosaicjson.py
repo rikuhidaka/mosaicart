@@ -68,7 +68,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     abatement = [[] for i in range(distance_pix+1)] 
     dele = []
     sa = []
-    nouse = []
+    nouse = {}
     nears = []
     huga = {}
     tile_num = list(range(len(tiles_features)))
@@ -76,22 +76,18 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     hoge=0
     c = 0
     
-    #for i in range(m*2-1):
+    
     for i in tqdm.trange(m*2-1):
-        #print('-------------------------------------------------------    '+str(i))
         j = i
         k = 0
         count = count%(distance_pix)
-        #print(count)
         
         while True:
             while j>m-1:
                 j-=1
                 k+=1
-                if(k==n):
+                if(k>n-1):
                     break
-            if(k==n):
-                break
             c = c%distance_pix
             
             tly = blk_size*k
@@ -103,22 +99,23 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             #一番平均が近い画像番号探す
             for x in range(distance_pix):
                 dele = dele + abatement[x]
-            dele = dele + nouse
+            
+            dele = dele + list([i for i in nouse.values()])
             dele.sort()
-            tiles = list(set(tile_num) - set(dele) )
-            number = np.argmin([distance_feature(feature(block,feature_div), tiles_features[tiles[y]]) for y in range(len(tiles))])
-            nearest = tiles[number]
-            hoge+=1
-            huga[k*m + j] = nearest 
-            #次のループで使ってはいけない画像番号の行列
-            abatement[distance_pix].append(nearest)
-            a = nearest
-            if(k == 0):
-                nouse = [a]
+                        
+                
+            if(k<n):
+                tiles = list(set(tile_num) - set(dele) )
+                number = np.argmin([distance_feature(feature(block,feature_div), tiles_features[tiles[y]]) for y in range(len(tiles))])
+                nearest = tiles[number]
+                hoge+=1
+                huga[k*m + j] = nearest 
+                #次のループで使ってはいけない画像番号の行列
+                abatement[distance_pix].append(nearest)
+                nouse[c] = nearest
+                c+=1
             else:
-                nouse = [a,b]
-            b = a
-            c+=1
+                nouse = {}
             dele = []
             tiles = []
                           
@@ -130,15 +127,14 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
                 abatement[count] = abatement[distance_pix]
                 nears = nears + abatement[distance_pix]
                 abatement[distance_pix] = []
+                nouse = {}
                 count+=1
                 break
     
     nears = sorted(huga.items())
     out['images'] = [nears[i][1] for i in range(len(nears))]
-    print(nears)
-    print(out['images'])
     fw = open('producemosaicart.json','w')
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(1,1,3,0,"")
+    main(1,15,3,0,"")
