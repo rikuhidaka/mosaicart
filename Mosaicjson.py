@@ -102,8 +102,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             
             dele = dele + list([i for i in nouse.values()])
             dele.sort()
-                        
-                
+               
             if(k<n):
                 tiles = list(set(tile_num) - set(dele) )
                 number = np.argmin([distance_feature(feature(block,feature_div), tiles_features[tiles[y]]) for y in range(len(tiles))])

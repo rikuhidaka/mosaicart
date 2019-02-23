@@ -1,8 +1,15 @@
+'''
+    とりあえずこれだけで動くようにした。
+    source.jpgとout.pngの表示はできるようになったが2回目以降は自動で更新してくれない
+    強引だけどchromeとかでshift+F5(super reload)押せば更新される。改善する必要あり。
+'''
+
 from flask import Flask, redirect, render_template, request, session, url_for, flash
 from flask_dropzone import Dropzone
 from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
 
 import os
+import shutil
 import urllib3
 import subprocess
 import json
@@ -13,7 +20,7 @@ app = Flask(__name__)
 dropzone = Dropzone(app)
 
 URL = "http://127.0.0.1:5000/upload/" 
-UPLOAD_FOLDER = './source'
+UPLOAD_FOLDER = './static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = set(['JPG', 'jpg', 'jpeg'])
 
@@ -26,7 +33,7 @@ app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image/*'
 app.config['DROPZONE_REDIRECT_VIEW'] = 'results'
 
 # Uploads settings
-app.config['UPLOADED_PHOTOS_DEST'] = os.getcwd() + '/uploads'
+app.config['UPLOADED_PHOTOS_DEST'] = os.getcwd() + '/subdata'
 
 photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
@@ -57,6 +64,7 @@ def index():
             )
             # append image urls
             file_urls.append(photos.url(filename))
+            print (file_urls)
             
         session['file_urls'] = file_urls
         return "uploading..."
@@ -65,14 +73,17 @@ def index():
 
 @app.route('/source',methods=['POST'])
 def get_source():
+    app.config['UPLOAD_FOLDER'] = './static'
     if request.method == 'POST':
         img_files = request.files
         for f in img_files:
             img_file = request.files.get(f)
             if img_file and allowed_file(img_file.filename):
-                img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'source.jpg'))    
+                img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'source.jpg'))
+                #return render_template('index.html')
+                #return redirect(url_for('index'))    
                 return redirect(url_for('results'))
-                #return render_template('source.html', img_url='./source' + img_file.filename)
+                #return render_template('index.html', img_url=os.listdir(UPLOAD_FOLDER)[::-1])
             else:
                 flash('対応していません')
                 return redirect(url_for('results'))
@@ -96,19 +107,11 @@ def results():
 @app.route('/post', methods=['POST'])
 def sending_file():
     if request.method == 'POST':
-        subprocess.call(['python3','feat.py'])
-        app.logger.info("特徴量の計算")
-        url = "http://127.0.0.1:5000/post/" 
-        url2 = "http://127.0.0.1:5000/source/"
-        headers = {"Content-Type" : "application/json"}
-        with open("features.json", 'r') as f:
-            json_data = json.load(f)
-        # httpリクエストを準備してPOST
-        #source_img = Image.open("source/source.jpg")
-        #res = requests.post(url, files=source_img)
-        file = {'source.jpg': open('source/source.jpg', 'rb')}
-        r = requests.post(url, headers=headers,json=json_data)
-        res = requests.post(url2, files=file)
+        subprocess.call(['python3','features.py'])
+        #app.logger.info("特徴量の計算")
+        while os.path.exists("features.json") == False:
+            print ("waiting")
+        subprocess.call(['python3','Mosaicjson.py'])
         file_urls = session['file_urls']
         session.pop('file_urls', None)
         return render_template('results.html')
@@ -117,20 +120,28 @@ def sending_file():
 def post():
     app.config['UPLOAD_FOLDER'] = './'
     if request.method == 'POST':
-        url3 = "http://127.0.0.1:5000/get/"
-        headers = {"Content-Type" : "application/json"}
-        #out.jsonの受け取り
-        r_get = requests.get(url3, headers=headers)
-        with open("out.json",'w') as f:
-            json.dump(r_get.json(),f,indent=4)
-        return redirect(url_for('mosaic'))
+        if os.path.exists("producemosaicart.json"):
+            subprocess.call(['python3', 'producemosaic.py'])
+        else:
+            return redirect(url_for('post'))
+        #return redirect(url_for('mosaic'))
+        return render_template('mosaic.html')
 
-@app.route('/art')
+@app.route('/backtop',methods=['POST'])
 def mosaic():
-    subprocess.call(['python3','producemosaicart.py'])
-    app.logger.info("モザイクアート作成中")
-    img = Image.open('out.jpg')
-    return render_template('mosaic.html')
+    #subprocess.call(['python3','producemosaic.py'])
+    #staticとsubdataの内容を削除
+    target_dir = 'static'
+    shutil.rmtree(target_dir)
+    os.mkdir(target_dir)
+    target_dir2 = 'subdata'
+    shutil.rmtree(target_dir2)
+    os.mkdir(target_dir2)
+    #.jsonの削除
+    os.remove('features.json')
+    os.remove('producemosaicart.json')
+    #最初の画面にもどる
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8888)
