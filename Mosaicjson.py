@@ -49,9 +49,8 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     n = h//blk_size # 縦
     m = w//blk_size # 横
     tile_blksz = tiles_features['block_size']
-    tiles_data = tiles_features['data']
-    tiles_features = tiles_data[1][:len(tiles_data[1])][1]
-
+    tiles_data = tiles_features['feature']
+    
     out = OrderedDict()
     out['block_size'] = tile_blksz
     out['mosaic_size_h'] = n
@@ -62,7 +61,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     nouse = {}
     nears = []
     huga = {}
-    tile_num = list(range(len(tiles_features)))
+    tile_num = list(range(len(tiles_data)))
     count = 0
     hoge=0
     c = 0
@@ -94,7 +93,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             dele.sort()
             if(k<n):
                 tiles = list(set(tile_num) - set(dele) )
-                number = np.argmin([distance_feature(feature(block,feature_div), tiles_features[tiles[y]]) for y in range(len(tiles))])
+                number = np.argmin([distance_feature(feature(block,feature_div), tiles_data[tiles[y]]) for y in range(len(tiles))])
                 nearest = tiles[number]
                 hoge+=1
                 huga[k*m + j] = nearest 

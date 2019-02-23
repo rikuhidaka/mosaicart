@@ -76,7 +76,7 @@ def main(feature_div):
     with open('features.json', 'w') as f:
         json.dump( OrderedDict([
             ('block_size', block_size),
-            ('data',(('name', img_paths),('feature',features)))
+            ('feature',features)
         ]), f, indent=4 )
 
 if __name__ == '__main__':
