@@ -6,10 +6,10 @@ from urllib import error
 from urllib import parse
 import bs4
 
-def main(keyword):
+def main(keyword,id):
     #検索キーワード
-    if not os.path.exists("./data"):
-        os.mkdir("data")
+    if not os.path.exists("./" + id + "/data"):
+        os.mkdir("./" + id + "/data")
     
     urlKeyword = parse.quote(keyword)
     url = 'https://www.google.com/search?hl=jp&q=' + urlKeyword + '&btnG=Google+Search&tbs=0&safe=off&tbm=isch'
@@ -58,5 +58,5 @@ def main(keyword):
         except error.URLError:
             continue
 if __name__ == "__main__":
-    main("hoge")
+    main("hoge","static")
 
