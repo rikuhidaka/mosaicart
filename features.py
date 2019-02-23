@@ -1,5 +1,4 @@
 #coding=utf-8
-
 import json
 from collections import OrderedDict
 from PIL import Image
