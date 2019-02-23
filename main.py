@@ -24,7 +24,7 @@ import producemosaic
 
 import numpy as np
 from PIL import Image
-from flask import Flask,request,url_for,send_from_directory,Response,make_response,jsonify
+from flask import Flask,request,url_for,send_from_directory,Response,make_response,jsonify,abort
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif','json'])
 
@@ -45,7 +45,7 @@ def set_cookie():
 
     sessionID = binascii.hexlify(os.urandom(8))
     lifespan = 60 * 60 * 24
-    expires = int(datetime.now().timestamp()) + lifespan
+    expires = int(datetime.datetime.now().timestamp()) + lifespan
 
     IDlist.append(sessionID)
 
@@ -54,8 +54,9 @@ def set_cookie():
     return response
 
 def cookie_check():
-    if request.cookie.get('ID') in IDlist:
-        return request.cookie.get('ID')
+    print(request.cookies.get('ID'))
+    if request.cookies.get('ID') in IDlist:
+        return request.cookies.get('ID')
     else:
         abort(404)
 
@@ -67,8 +68,8 @@ def make_directory():
 #source.pngを受け取る
 @app.route('/source/',methods=['GET','POST'])
 def source():
-    #directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
+    directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
 
     json_data = request.get_json(force=True)
 
@@ -100,8 +101,8 @@ def source():
 #features.jsonを受け取る
 @app.route('/post/',methods=['GET','POST'])
 def json_post():
-   # directory = cookie_check()
-    app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
+    directory = cookie_check()
+    app.config['UPLOAD_FOLDER'] = './' + directory + '/'
     json_data = request.get_json(force=True)
     filename = "features.json"
     with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'w') as f:
@@ -112,8 +113,8 @@ def json_post():
 @app.route('/get/',methods=['GET'])
 def json_get():
     if request.method == 'GET':
-        #directory = cookie_check()
-        app.config['UPLOAD_FOLDER'] = './'# + directory + '/'
+        directory = cookie_check()
+        app.config['UPLOAD_FOLDER'] = './' + directory + '/'
         filename = "producemosaicart.json"
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename),'r') as f:
             json_data = json.load(f)
