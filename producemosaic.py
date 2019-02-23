@@ -47,6 +47,7 @@ def main():
     size = mosaic['block_size']
     h = mosaic['mosaic_size_h']
     w = mosaic['mosaic_size_w']
+    images = mosaic['images']
     
     out = np.zeros((size*h, size*w, 3), dtype=np.uint8)
     for i in tqdm.trange(h):
@@ -56,7 +57,7 @@ def main():
             out_tlx = size*j
             out_bry = size*(i+1)
             out_brx = size*(j+1)
-            out[out_tly:out_bry, out_tlx:out_brx, :] = data_list[int(mosaic[str((i*w)+j)])]
+            out[out_tly:out_bry, out_tlx:out_brx, :] = data_list[images[(i*w)+j]]
         
     Image.fromarray(out).save('out.png')
 

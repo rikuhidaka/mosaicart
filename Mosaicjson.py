@@ -141,4 +141,4 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(1,30,3,0,"")
+    main(1,1,3,0,"")
