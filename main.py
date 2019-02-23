@@ -82,7 +82,6 @@ def source():
 
     return make_response(jsonify({'result':"ok"}))
 
-
 #features.jsonを受け取る
 @app.route('/post/',methods=['GET','POST'])
 def json_post():
@@ -136,7 +135,7 @@ def out():
         return Response(response=image, content_type='image/png')
     else:
         abort(404)
-   
+
 #Mosaicjson.pyを実行
 @app.route('/mosaic/',methods=['GET','POST'])
 def mosaic():
