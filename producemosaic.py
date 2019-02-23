@@ -23,7 +23,7 @@ def load_img(path):
 
 def load_data(size=50):
         
-    for i in Path('subdata').glob('**/*.png'):
+    for i in Path('data').glob('**/*.png'):
         print(type(i))
         rgb_im = Image.open(str(i)).convert('RGB')
         root,_ = os.path.splitext(str(i))
@@ -31,7 +31,7 @@ def load_data(size=50):
         rgb_im.save(name)
         os.remove(str(i))
     
-    img_paths = list( Path('subdata/').glob('**/*.jpg') )
+    img_paths = list( Path('data/').glob('**/*.jpg') )
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]

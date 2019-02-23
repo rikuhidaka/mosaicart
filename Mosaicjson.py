@@ -68,7 +68,9 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     abatement = [[] for i in range(distance_pix+1)] 
     dele = []
     sa = []
-    nouse = [   ]
+    nouse = []
+    nears = []
+    huga = {}
     tile_num = list(range(len(tiles_features)))
     count = 0
     hoge=0
@@ -102,20 +104,12 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             for x in range(distance_pix):
                 dele = dele + abatement[x]
             dele = dele + nouse
-            #print(abatement)
-            #print(nouse)
-            #print(dele)
-            #print('\n')
             dele.sort()
-            #print('今回除いている画像番号\n'+str(dele))
-            #print('１回前,2回前で使用済み\n'+str(abatement[0])+'\n'+str(abatement[1]))
-            #print('この列で使用済み\n'+str(abatement[distance_pix]))
             tiles = list(set(tile_num) - set(dele) )
-            print('今回の候補\n'+str(tiles))
             number = np.argmin([distance_feature(feature(block,feature_div), tiles_features[tiles[y]]) for y in range(len(tiles))])
             nearest = tiles[number]
             hoge+=1
-            out[str(k*m + j)] = str(nearest)
+            huga[k*m + j] = nearest 
             #次のループで使ってはいけない画像番号の行列
             abatement[distance_pix].append(nearest)
             a = nearest
@@ -124,11 +118,6 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             else:
                 nouse = [a,b]
             b = a
-            #このループ上ですでに使っている画像番号の行列
-            #print(abatement)
-            #print('\n'+str(nearest))
-            #print(nearest in dele)
-            #print('\n')
             c+=1
             dele = []
             tiles = []
@@ -136,16 +125,20 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
             j-=1
             k+=1
             if j < 0:
-                #print(count)
                 dele = []
                 abatement[count] = []
                 abatement[count] = abatement[distance_pix]
+                nears = nears + abatement[distance_pix]
                 abatement[distance_pix] = []
                 count+=1
                 break
-    #print(abatement)
+    
+    nears = sorted(huga.items())
+    out['images'] = [nears[i][1] for i in range(len(nears))]
+    print(nears)
+    print(out['images'])
     fw = open('producemosaicart.json','w')
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(1,30,2,0,"")
+    main(1,30,3,0,"")

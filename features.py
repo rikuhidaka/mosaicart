@@ -35,7 +35,7 @@ def load_data(size=50):
         rgb_im.save(name)
         os.remove(str(i))
     
-    img_paths = list( Path('data/').glob('**/*.jpg') )
+    img_paths = list( Path('data/').glob('**/*.jpg') or Path('data/').glob('**/*.JPG'))
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
