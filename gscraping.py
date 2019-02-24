@@ -6,7 +6,7 @@ from urllib import error
 from urllib import parse
 import bs4
 
-def main(keyword,id):
+def main(keyword,id,hoge):
     #検索キーワード
     if not os.path.exists("./" + id + "/data"):
         os.mkdir("./" + id + "/data")
@@ -22,6 +22,7 @@ def main(keyword,id):
     html = bs4.BeautifulSoup(html, "html.parser")
     elems = html.select('.rg_meta.notranslate')
     counter = 0
+    c = 0
     for ele in elems:
         ele = ele.contents[0].replace('"','').split(',')
         eledict = dict()
@@ -29,7 +30,7 @@ def main(keyword,id):
             num = e.find(':')
             eledict[e[0:num]] = e[num+1:]
         imageURL = eledict['ou']
-
+        
         pal = '.jpg'
         if '.jpg' in imageURL:
             pal = '.jpg'
@@ -43,14 +44,21 @@ def main(keyword,id):
             pal = '.jpeg'
         else:
             pal = '.jpg'
+
+        c += 1
+        hoge[id] = round(float(c)/float(len(elems)),2)
+        print(hoge[id])
+ 
+
 #保存場所の設定
         try:
             img = req.urlopen(imageURL)
-            localfile = open('./data/'+keyword+str(counter)+pal, 'wb')
+            localfile = open('./' + id + '/data/'+keyword+str(counter)+pal, 'wb')
             localfile.write(img.read())
             img.close()
             localfile.close()
             counter += 1
+
         except UnicodeEncodeError:
             continue
         except error.HTTPError:
@@ -58,5 +66,5 @@ def main(keyword,id):
         except error.URLError:
             continue
 if __name__ == "__main__":
-    main("hoge","static")
+    main("hoge","static",{"static":0.0})
 
