@@ -1,0 +1,48 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>mosaic art</title>
+</head>
+ <meta http-equiv="Cache-Control" content="no-store">
+<body>
+    <h1>Completed</h1>
+    <form action="/backtop" method="post" name="send" class="form-inline">
+        <button type="submit" name="send" class="btn btn-default">Back to TOP</button>
+    </form>
+    <div id="js-target">
+    <img style="height: 500px" src="mosaic_img/out.png" alt="mosaic art" title="mosaic art">
+    </div>
+    <div id="result"></div>
+    <form action="/re_mosaic" method="post">
+        <p>X1座標:<input type="number" name="test1">
+        Y1座標:<input type="number" name="test2">
+        </p>
+        <p>X2座標:<input type="number" name="test3">
+            Y2座標:<input type="number" name="test4">
+            <button type="submit" name="send" class="btn btn-default">座標の送信</button>
+        </p>
+        
+    </form>
+    <script type="text/javascript">
+        let target = document.getElementById('js-target');
+    
+        target.addEventListener('click', getPosition);
+    
+        function getPosition(e) {
+            let offsetX = e.offsetX; // =>要素左上からのx座標
+            let offsetY = e.offsetY; // =>要素左上からのy座標
+            let pageX = e.pageX; // =>ウィンドウ左上からのx座標
+            let pageY = e.pageY; // =>ウィンドウ左上からのy座標
+            let clientX = e.clientX; // =>ページ左上からのx座標
+            let clientY = e.clientY; // =>ページ左上からのy座標
+            console.log("offset"+e.offsetX+","+e.offsetY)
+            document.getElementById("txtX").value = offsetX;
+            document.getElementById("txtY").value = offsetY;
+            }
+    
+    </script>
+    X座標:<input type="text" id="txtX" />
+    Y座標:<input type="text" id="txtY" />
+    <img src="{{remosaic_url}}" >
+</body>
+</html>

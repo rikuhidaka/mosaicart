@@ -41,7 +41,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     with open('features.json', 'r') as f:
         tiles_features = json.load(f, object_pairs_hook=OrderedDict)
     # 近似対象画像を読み込む
-    img = load_img('static/source.jpg')
+    img = load_img('source_img/source.jpg')
     # 近似対象画像のサイズ(画素)
     h = img.shape[0] # 縦
     w = img.shape[1] # 横
@@ -67,7 +67,7 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
     c = 0
     
     
-    for i in tqdm.trange(m*2-1):
+    for i in tqdm.trange(m+n-1):
         j = i
         k = 0
         count = count%(distance_pix)
@@ -117,9 +117,10 @@ def main(feature_div,blk_size,distance_pix,hoge,keyword):
                 count+=1
                 break
     nears = sorted(huga.items())
+    print(len(nears))
     out['images'] = [nears[i][1] for i in range(len(nears))]
     fw = open('producemosaicart.json','w')
     json.dump(out,fw,indent=4)
 
 if __name__ == '__main__':
-    main(1,15,3,0,"")
+    main(1,10,2,0,"")

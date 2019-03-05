@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta http-equiv="Cache-Control" content="no-store">
+    <title>高専ルネサンス</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script type="text/javascript" src="hoge.js"></script>
+    {{ dropzone.load() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 3%; min-height: 200px; min-width: 300px;') }}
+    <style>
+        body {
+          background: #eeeeee;
+        }
+        h1 {
+          text-align: center;
+        }
+        h2 {
+          text-align: center;
+        }
+        div {
+          text-align: right;
+          margin: 3%;
+        }
+        Uploadedfiles {
+          margin: 3%;
+          float:left;
+        }
+    </style>
+  </head>
+  {% for message in get_flashed_messages() %}
+  <div class="alert alert-success">{{ message }}</div>
+  {% endfor %}
+  <body>
+    <h1>Welcome to mosaic art house!</h1>
+    
+    <p>元画像</p>
+    {{ dropzone.create(action_view='get_source') }}
+    <p>素材</p>
+    {{ dropzone.create(action_view='index') }}
+
+  <div>
+  <form action="/post" method="post" name="send" class="form-inline">
+    <button type="submit" name="send" class="btn btn-default">send</button>
+  </form>
+  
+  <!--<img style="height: 300px" src="{{ img_url }}" alt="元画像"> -->
+  <img style="height: 300px" src="_uploads/source/{{ source_name | default('profile.jpg') }}" alt="元画像">
+  <ul>
+    <!-- {% for img_url in img_urls %}
+        <li><img style="height: 150px" src="{{ img_url }}"></li>
+    {% endfor %} -->
+  </ul>
+  
+  </div>
+  
+    <h2>Uploaded files</h2>
+  <div id="Uploadedfiles">
+  <ul>
+      {% for file_url in file_urls %}
+        <li><img style="height: 150px" src="{{ file_url }}"></li>
+      {% endfor %}
+  </ul>
+  </div>
+  </body>
+</html>

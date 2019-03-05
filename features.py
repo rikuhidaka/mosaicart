@@ -24,9 +24,9 @@ def load_img(path):
     img.convert('HSV')
     return np.asarray(img)[:, :, :3]
 
-def load_data(size=50):
+def load_data(id,size=50):
         
-    for i in Path('data').glob('**/*.png'):
+    for i in Path('subdata/').glob('**/*.png'):
         print(type(i))
         rgb_im = Image.open(str(i)).convert('RGB')
         root,_ = os.path.splitext(str(i))
@@ -34,7 +34,7 @@ def load_data(size=50):
         rgb_im.save(name)
         os.remove(str(i))
     
-    img_paths = list( Path('data/').glob('**/*.jpg') or Path('data/').glob('**/*.JPG'))
+    img_paths = list( Path('subdata/').glob('**/*.jpg') or Path('subdata/').glob('**/*.JPG'))
     img_paths = [str(path) for path in img_paths]
 
     img_list = [ load_img(img) for img in img_paths ]
@@ -58,8 +58,8 @@ def feature(img,feature_div):
 
     return f / n_chunk_pixels
 
-def main(feature_div):
-    img_paths, img_list = load_data() # 素材画像の読み込み
+def main(feature_div,id):
+    img_paths, img_list = load_data(id=id) # 素材画像の読み込み
     #print(img_list)
     img_paths.sort()
     assert(len(set((img.shape for img in img_list))) == 1) # 素材画像がすべて同じ大きさかチェック
@@ -80,4 +80,4 @@ def main(feature_div):
         ]), f, indent=4 )
 
 if __name__ == '__main__':
-    main(1)
+    main(1,"./")
