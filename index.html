@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+    	<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    	<title>Sample</title>
+    	<!-- jQuery読み込み -->
+		<script src="assets/javascript/jquery/jquery-3.4.1.min.js"></script>
+		<!-- CSS読み込み -->
+		<link rel="stylesheet" type="text/css" href="assets/css/dropify.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+    	<!-- JS読み込み -->
+		<script src="javascript/dropify.js"></script>
+		<!--初期化-->
+		<script>
+			$(document).ready(function(){
+				$('.dropify').dropify({
+					messages: {
+        				'default': '元となる画像をここにドラッグ＆ドロップするか、ここをクリックして選択してください',
+        				'replace': 'ドラッグ&ドロップ or 選択して別の画像に置換できます',
+        				'remove':  '削除',
+        				'error':   'エラーが発生しました'
+    				}
+				});				
+			});
+		</script>  
+  	</head>
+    <body>
+		<nav class="navbar navbar-expand-sm navbar-dark bg-dark mt-3 mb-3">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav4" aria-controls="navbarNav4" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<a class="navbar-brand" href="#">モザイクアート</a>
+			<div class="collapse navbar-collapse">
+				<ul class="navbar-nav">
+					<li class="nav-item active">
+						<a class="nav-link" href="#">ローカルから</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Google検索から</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+		<!-- dropifyクラス適用 -->
+		<form>
+			<input type="file" class="dropify" id="source" onchange="OnFileSelect( this );" multiple>
+		</form>
+		<br/><br/>
+		<p>素材となる画像を選択：</p>
+		<input type="file" onchange="OnFileSelect( this );" multiple />
+		<ul id="ID001" ></ul>
+		
+		<script type="text/javascript" language="javascript">
+			function OnFileSelect( inputElement )
+			{
+				// ファイルリストを取得
+				var fileList = inputElement.files;
+			
+				// ファイルの数を取得
+				var fileCount = fileList.length;
+			
+				var loadCompleteCount = 0;
+				var imageList = "";
+			
+				// 選択されたファイルの数だけ処理する
+				for ( var i = 0; i < fileCount; i++ ) {
+			
+					// FileReaderを生成
+					var fileReader = new FileReader();
+			
+					// ファイルを取得
+					var file = fileList[ i ];
+			
+					// 読み込み完了時の処理を追加
+					fileReader.onload = function() {
+			
+						// <li>,<img>タグの生成
+							imageList += "<li><img src=\"" + this.result + "\" /></li>\r\n";
+			
+						// 選択されたファイルすべの処理が完了したら、<ul>タグに流し込む
+						if ( ++loadCompleteCount == fileCount ) {
+			
+							// <ul>タグに<li>,<img>を流し込む
+							document.getElementById( "ID001" ).innerHTML = imageList;
+						}
+					};
+			
+					// ファイルの読み込み(Data URI Schemeの取得)
+					fileReader.readAsDataURL( file );
+				}
+			}
+		</script>				
+		
+    </body>
+</html>
