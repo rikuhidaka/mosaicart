@@ -1,6 +1,11 @@
 function createImageData(img) {
 
-    var ct = $('#canvas').getContext('2d');
+    var cv = document.createElement('canvas');
+
+    cv.width = img.naturalWidth;
+    cv.height = img.naturalHeight;
+
+    var ct = cv.getContext('2d');
 
     ct.drawImage(img, 0, 0);
 
