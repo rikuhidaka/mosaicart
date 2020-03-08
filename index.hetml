@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<script src="assets/javascript/jquery/jquery-3.4.1.min.js"></script>
+<body>
+    <input type="file" id="image" name="avatar" accept="image/png, image/jpeg">
+    <canvas id='canvas'></canvas>
+</body>
+</html>
