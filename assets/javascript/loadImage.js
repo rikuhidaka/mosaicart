@@ -1,43 +1,65 @@
 function createImageData(img) {
-
-    var ct = $('#canvas').getContext('2d');
-
+    let ct = $('#canvas').getContext('2d');
     ct.drawImage(img, 0, 0);
-
-    var data = ct.getImageData(0, 0, cv.width, cv.height);
+    let data = ct.getImageData(0, 0, cv.width, cv.height);
 
     return data;
+}
 
+function getRGB(image_data, size) {
+    let rgb = []
+    let r = []
+    let g = []
+    let b = []
+
+    for (let i = 0; i < size * size; i++) {
+        r.push(image_data.data[i * 4]);
+        g.push(image_data.data[i * 4 + 1]);
+        b.push(image_data.data[i * 4 + 2]);
+    }
+
+    rgb.r = r
+    rgb.b = b
+    rgb.g = g
+    return rgb
+}
+
+function imageAverageRGB(image_data) {
+    let average_rgb
+    let r = 0
+    let g = 0
+    let b = 0
+    let size = image_data.height
+
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            let index = (j + i * image.width) * 4;
+            r += image_data[index]
+            g += image_data[index + 1]
+            b += image_data[index + 2]
+        }
+    }
+    average_rgb.r = r / (size * size)
+    average_rgb.g = g / (size * size)
+    average_rgb.b = b / (size * size)
+
+    return average_rgb
 }
 
 $(document).on('change', '#image', function () {
-    var file = this.files[0];
+    let file = this.files[0];
     if (!file.type.match(/^image\/(png|jpeg|gif)$/)) return;
 
-    var image = createImageData(file)
-    var r = []
-    var g = []
-    var b = []
-    var size
-
-    if (image.height < image.width) {
-        size = image.height;
-    } else {
-        size = image.width;
+    let size = image_data.height
+    let image_data = createImageData(file)
+    let RGB = getRGB(image_data, size)
+    let distance = []
+    for (let i = 0; i < size * size; i++) {
+        let r = RGB.r[i]
+        let g = RGB.b[i]
+        let b = RGB.g[i]
+        let tile_rgb = imageAverageRGB()
+        distance.push(Math.pow(r - tile_rgb.r, 2) + Math.pow(g - tile_rgb.g, 2) + Math.pow(b - tile_rgb.b, 2))
     }
-
-    for (let i = 0; i < size; i++) {
-        let r_list = []
-        let g_list = []
-        let b_list = []
-        for (let j = 0; j < size; j++) {
-            let index = (j + i * image.width) * 4;
-            r_list.push(image.data[index]);
-            g_list.push(image.data[index + 1]);
-            b_list.push(image.data[index + 2]);
-        }
-        r.push(r_list)
-        g.push(g_list)
-        b.push(b_list)
-    }
+    tile_num = distance.indexOf(Math.min(distance))
 });
