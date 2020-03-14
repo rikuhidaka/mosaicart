@@ -7,6 +7,17 @@
  * =============================================================
  */
 
+$(document).ready(function () {
+    $('.dropify').dropify({
+        messages: {
+            'default': '元となる画像をここにドラッグ＆ドロップするか、ここをクリックして選択してください',
+            'replace': 'ドラッグ&ドロップ or 選択して別の画像に置換できます',
+            'remove': '削除',
+            'error': 'エラーが発生しました'
+        }
+    });
+});
+
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define(['jquery'], factory);

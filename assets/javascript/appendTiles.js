@@ -1,4 +1,4 @@
-function OnFileSelect(inputElement) {
+function appendTiles(inputElement) {
     // ファイルリストを取得
     let fileList = inputElement.files;
 
@@ -65,16 +65,6 @@ function loadImage(src) {
 }
 
 $(document).on('change', '.image', function () {
-    OnFileSelect(this);
+    appendTiles(this);
 });
 
-$(document).ready(function () {
-    $('.dropify').dropify({
-        messages: {
-            'default': '元となる画像をここにドラッグ＆ドロップするか、ここをクリックして選択してください',
-            'replace': 'ドラッグ&ドロップ or 選択して別の画像に置換できます',
-            'remove': '削除',
-            'error': 'エラーが発生しました'
-        }
-    });
-});
