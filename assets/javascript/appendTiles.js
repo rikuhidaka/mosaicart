@@ -28,7 +28,6 @@ function appendTiles(inputElement) {
         loadFile(file).then(function (response) {
             //canvas設定
             let canvas = $('.tiles').children()[i];
-            console.log(toString.call(canvas));
             canvas.width = canvasWidth;
             canvas.height = canvasWidth;
 
@@ -64,7 +63,6 @@ function loadImage(src) {
     });
 }
 
-$(document).on('change', '.image', function () {
+$(document).on('change', '.tilesImage', function () {
     appendTiles(this);
 });
-
