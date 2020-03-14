@@ -1,15 +1,12 @@
-function OnFileSelect(inputElement) {
+function appendVisible(inputElement) {
     // ファイルリストを取得
     let fileList = inputElement.files;
 
     // ファイルの数を取得
     let fileCount = fileList.length;
 
-    //正方形の大きさはウィンドウ依存
-    let canvasWidth = window.innerWidth*0.1;
-
     //canvas初期化
-    $('.tiles').empty();
+    $('.canvas').empty();
 
 
     // 選択されたファイルの数だけ処理する
@@ -22,21 +19,21 @@ function OnFileSelect(inputElement) {
         if(!file.type.match(/^image\/(png|jpeg|gif)$/)) return ;
         
         // <canvas>タグの追加
-        $('.tiles').append("<canvas></canvas>\r\n");
+        $(".canvas").append("<canvas></canvas>\r\n");
 
         // 読み込み完了時の処理を追加
         loadFile(file).then(function (response){ 
             //canvas設定
-            let canvas = $('.tiles').children()[i];
-            console.log(toString.call(canvas));   
-            canvas.width = canvasWidth;
-            canvas.height = canvasWidth;
+            let canvas = $(".canvas").children()[i];
 
             let ctx = canvas.getContext('2d');
 
             loadImage(response).then(function(response){
-                ctx.clearRect(0,0,canvasWidth,canvasWidth);
-                ctx.drawImage(response,0,0,canvasWidth,canvasWidth);
+                canvas.width = response.naturalWidth;
+                canvas.height = response.naturalHeight;
+                console.log(canvas.width + ", " + canvas.height);   
+                ctx.clearRect(0,0,response.naturalWidth,response.naturalHeight);
+                ctx.drawImage(response,0,0,response.naturalWidth,response.naturalHeight);
             }).catch(function(e){
                 console.log(e,"Failed to load image")
             })
@@ -64,17 +61,3 @@ function loadImage(src) {
     });
 }
 
-$(document).on('change', '.image', function () {
-    OnFileSelect(this);
-});
-
-$(document).ready(function () {
-    $('.dropify').dropify({
-        messages: {
-            'default': '元となる画像をここにドラッグ＆ドロップするか、ここをクリックして選択してください',
-            'replace': 'ドラッグ&ドロップ or 選択して別の画像に置換できます',
-            'remove': '削除',
-            'error': 'エラーが発生しました'
-        }
-    });
-});
