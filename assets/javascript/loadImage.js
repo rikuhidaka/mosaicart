@@ -1,11 +1,3 @@
-function createImageData(img) {
-    let ct = $('#canvas').getContext('2d');
-    ct.drawImage(img, 0, 0);
-    let data = ct.getImageData(0, 0, cv.width, cv.height);
-
-    return data;
-}
-
 function getRGB(image_data, size) {
     let rgb = []
     let r = []
@@ -46,20 +38,35 @@ function imageAverageRGB(image_data) {
     return average_rgb
 }
 
-$(document).on('change', '#image', function () {
-    let file = this.files[0];
-    if (!file.type.match(/^image\/(png|jpeg|gif)$/)) return;
-
-    let size = image_data.height
-    let image_data = createImageData(file)
-    let RGB = getRGB(image_data, size)
-    let distance = []
-    for (let i = 0; i < size * size; i++) {
-        let r = RGB.r[i]
-        let g = RGB.b[i]
-        let b = RGB.g[i]
-        let tile_rgb = imageAverageRGB()
-        distance.push(Math.pow(r - tile_rgb.r, 2) + Math.pow(g - tile_rgb.g, 2) + Math.pow(b - tile_rgb.b, 2))
+function produceMosaic(tiles, tile_num, source_size, size) {
+    $('.result').append("<canvas id='mosaic'></canvas>")
+    let context = $('#mosaic').getContext('2d')
+    for (let i = 0; i < source_size; i++) {
+        for (let j = 0; j < source_size; j++) {
+            context.drawImage(tiles[tile_num[i * source_size + j]], 0, 0, size, size, i, j, 1, 1)
+        }
     }
-    tile_num = distance.indexOf(Math.min(distance))
+}
+
+$(document).on('click', '.start', function () {
+    source = $('.source').getContext('2d')
+    let size = source.height
+    let source_rgb = getRGB(source, size)
+    let tiles_rgb = []
+    let tiles = []
+    let distance = []
+    $('.tile').each(function (num, $tile) {
+        tiles.push($tile.getContext('2d'))
+        tiles_rgb.push(imageAverageRGB($tile.getContext('2d')))
+    });
+    $('.tile')[0].getContext
+    for (let i = 0; i < size * size; i++) {
+        let r = source_rgb.r[i]
+        let g = source_rgb.b[i]
+        let b = source_rgb.g[i]
+        tiles_rgb.array.forEach(tile_rgb => {
+            distance.push(Math.pow(r - tile_rgb.r, 2) + Math.pow(g - tile_rgb.g, 2) + Math.pow(b - tile_rgb.b, 2))
+        });
+        tile_num = distance.indexOf(Math.min(distance))
+    }
 });
