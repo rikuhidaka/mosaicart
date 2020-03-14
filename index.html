@@ -13,8 +13,6 @@
     	<!-- JS読み込み -->
 		<script src="assets/javascript/dropify.js"></script>
 		<script src="assets/javascript/showimage.js"></script>
-		<script src="bower_packages/numjs/dist/numjs.min.js"></script>
-		<!--初期化-->
   	</head>
     <body>
 		<nav class="navbar navbar-expand-sm navbar-dark bg-dark mt-3 mb-3">
@@ -35,11 +33,12 @@
 		</nav>
 		<!-- dropifyクラス適用 -->
 		<form>
-			<input type="file" class="dropify image" multiple>
+			<input type="file" class="dropify">
 		</form>
 		<br/><br/>
 		<p>素材となる画像を選択：</p>
-		<input type="file" class="image" multiple />
-		<ul id="ID001" ></ul>					
+		<input type="file" class="image" multiple /><br/>
+		<div class="tiles"></div><br/>
+		<button class="start">生成開始</button>			
     </body>
 </html>
