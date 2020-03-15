@@ -4,7 +4,7 @@ function getRGB(image_data, size) {
     let g = []
     let b = []
 
-    for (let i = 0; i < size * size; i++) {
+    for (let i = 0; i < size; i++) {
         r.push(image_data.data[i * 4]);
         g.push(image_data.data[i * 4 + 1]);
         b.push(image_data.data[i * 4 + 2]);
@@ -16,16 +16,15 @@ function getRGB(image_data, size) {
     return rgb
 }
 
-function imageAverageRGB(image_data) {
-    let average_rgb
+function tileAverageRGB(image_data, size) {
+    let average_rgb = {}
     let r = 0
     let g = 0
     let b = 0
-    let size = image_data.height
 
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
-            let index = (j + i * image.width) * 4;
+            let index = (j + i * size) * 4;
             r += image_data[index]
             g += image_data[index + 1]
             b += image_data[index + 2]
@@ -38,38 +37,46 @@ function imageAverageRGB(image_data) {
     return average_rgb
 }
 
-function produceMosaic(tiles, tile_num, source_size, size) {
-    $('.canvas').append("<canvas id='mosaic'></canvas>")
-    let context = $('#mosaic').getContext('2d')
-    for (let i = 0; i < source_size; i++) {
-        for (let j = 0; j < source_size; j++) {
-            context.drawImage(tiles[tile_num[i * source_size + j]], 0, 0, size, size, i, j, 1, 1)
+function produceMosaic(tiles, tile_num, source_height, source_width, size) {
+    $('#canvas').append("<canvas id='mosaic'></canvas>")
+    $('#mosaic').attr({
+        width: size * source_width / 10,
+        height: size * source_height / 10
+    })
+    let context = document.getElementById('mosaic').getContext('2d')
+    for (let i = 0; i < source_height; i++) {
+        for (let j = 0; j < source_width; j++) {
+            context.drawImage(tiles[tile_num[i * source_width + j]], 0, 0, size, size, j * size / 10, i * size / 10, size / 10, size / 10)
         }
     }
 }
 
 $(document).on('click', '.start', function () {
-    console.log('hoge')
-    source = $('.source')[0].getContext('2d')
-    let size = source.height
-    let source_rgb = getRGB(source, size)
+    let source = document.getElementById('source')
+    let context = source.getContext('2d')
+    let width = source.width
+    let height = source.height
+    let source_rgb = getRGB(context.getImageData(0, 0, width, height), width * height)
     let tiles_rgb = []
     let tiles = []
-    let distance = []
-    $('.tile').each(function (num, $tile) {
-        tiles.push($tile.getContext('2d'))
-        tiles_rgb.push(imageAverageRGB($tile.getContext('2d')))
-    });
-    tile_size = $('.tile')[0].getContext('2d').width
-    for (let i = 0; i < size * size; i++) {
+    let tile_num = []
+    let tiles_list = document.getElementsByClassName('tile')
+    tile_size = tiles_list[0].width
+    for (let i = 0; i < tiles_list.length; i++) {
+        let tile = tiles_list[i]
+        tiles.push(tile)
+        tiles_rgb.push(tileAverageRGB(tile.getContext('2d').getImageData(0, 0, tile_size, tile_size).data, tile_size))
+    }
+
+    for (let i = 0; i < height * width; i++) {
+        let distance = []
         let r = source_rgb.r[i]
         let g = source_rgb.b[i]
         let b = source_rgb.g[i]
-        tiles_rgb.array.forEach(tile_rgb => {
-            distance.push(Math.pow(r - tile_rgb.r, 2) + Math.pow(g - tile_rgb.g, 2) + Math.pow(b - tile_rgb.b, 2))
-        });
-        tile_num = distance.indexOf(Math.min(distance))
+        for (let j = 0; j < tiles_rgb.length; j++) {
+            distance.push(Math.pow(r - tiles_rgb[j].r, 2) + Math.pow(g - tiles_rgb[j].g, 2) + Math.pow(b - tiles_rgb[j].b, 2))
+        }
+        tile_num.push(distance.indexOf(Math.min(...distance)))
     }
-    console.log(tiles)
-    produceMosaic(tiles, tile_num, size, tile_size)
+    produceMosaic(tiles, tile_num, height, width, tile_size)
 });
