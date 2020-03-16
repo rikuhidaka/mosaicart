@@ -79,4 +79,5 @@ $(document).on('click', '.start', function () {
         tile_num.push(distance.indexOf(Math.min(...distance)))
     }
     produceMosaic(tiles, tile_num, height, width, tile_size)
+    $(".download").css("display","inline")
 });

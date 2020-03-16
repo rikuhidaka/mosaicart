@@ -39,14 +39,16 @@
 		<form>
 			<input type="file" class="dropify toCanvas sourceImage">
 		</form>
-		<br/><br/>
+		<br/>
 		<div style="display: none;" class="hiddenCanvas"></div>
-		<p>素材となる画像を選択：</p>
-		<input type="file" class="tilesImage" multiple /><br/>
+		<div class = "materialInput" style="display: none;">
+			<p>素材となる画像を選択：</p>
+			<input type="file" class="tilesImage" multiple />
+		</div>
+		<br/>
 		<div class="tiles"></div><br/>
-
-		<button class="start">生成開始</button><br/>
+		<button style="display: none;" class="start">生成開始</button><br/>
 		<div id="canvas"></div><br/>
-		<button class="download">ダウンロード</button>
+		<button style="display: none;" class="download">ダウンロード</button>
     </body>
 </html>
