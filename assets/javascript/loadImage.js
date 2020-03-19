@@ -37,7 +37,7 @@ function tileAverageRGB(image_data, size) {
     return average_rgb
 }
 
-function produceMosaic(tiles, tile_num, source_height, source_width, size) {
+function produceMosaicArt(tiles, tile_num, source_height, source_width, size) {
     $('#canvas').append("<canvas id='mosaic'></canvas>")
     $('#mosaic').attr({
         width: size * source_width / 10,
@@ -78,5 +78,5 @@ $(document).on('click', '.start', function () {
         }
         tile_num.push(distance.indexOf(Math.min(...distance)))
     }
-    produceMosaic(tiles, tile_num, height, width, tile_size)
+    produceMosaicArt(tiles, tile_num, height, width, tile_size)
 });
