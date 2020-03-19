@@ -65,4 +65,5 @@ function loadImage(src) {
 
 $(document).on('change', '.tilesImage', function () {
     appendTiles(this);
+    $(".start").css("display","inline")
 });
