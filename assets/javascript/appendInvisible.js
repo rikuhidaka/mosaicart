@@ -62,5 +62,6 @@ function loadImage(src) {
 
 $(document).on('change', '.toCanvas', function () {
     appendInvisible(this);
+    $(".materialInput").css("display","inline")
 });
 
